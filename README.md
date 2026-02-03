@@ -1,11 +1,11 @@
 # demo_microservices_flask
 has three microservices (User, Product, Orders)
 
-#Quick Start
+# Quick Start
 git clone https://github.com/dkoh-pub/demo_microservices_flask.git
-#Enter directory
+# Enter directory
 cd ~/demo_microservices_flask
-#Run docker
+# Run docker
 docker compose up -d
 
 #test API
