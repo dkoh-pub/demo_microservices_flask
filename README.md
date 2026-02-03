@@ -5,3 +5,6 @@ has three microservices (User, Product, Orders)
 git clone https://github.com/dkoh-pub/demo_microservices_flask.git
 cd ~/demo_microservices_flask
 docker compose up -d
+
+#test API
+curl -i http://localhost:5001/api/v1/users
