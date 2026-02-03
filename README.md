@@ -8,5 +8,5 @@ cd ~/demo_microservices_flask
 # Run docker
 docker compose up -d
 
-#test API
+# test API
 curl -i http://localhost:5001/api/v1/users
