@@ -1,0 +1,131 @@
+# Docker Compose for F5 API Security Demo
+# Deploys Flask microservices and NGINX API Gateway
+
+version: '3.8'
+
+services:
+  # ============================================
+  # Users API Service
+  # ============================================
+  users-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: users-api
+    hostname: users-api
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+      - PORT=5001
+    ports:
+      - "5001:5001"
+    command: ["python", "users_api.py"]
+    networks:
+      - api-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================
+  # Products API Service
+  # ============================================
+  products-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: products-api
+    hostname: products-api
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+      - PORT=5002
+    ports:
+      - "5002:5002"
+    command: ["python", "products_api.py"]
+    networks:
+      - api-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5002/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================
+  # Orders API Service
+  # ============================================
+  orders-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: orders-api
+    hostname: orders-api
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+      - PORT=5003
+    ports:
+      - "5003:5003"
+    command: ["python", "orders_api.py"]
+    networks:
+      - api-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5003/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  api-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+# Optional: Uncomment for persistent storage
+# volumes:
+#   api-logs:
+#     driver: local
