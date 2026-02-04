@@ -1,0 +1,48 @@
+meta {
+  name: XSS Test
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/{{apiVersion}}/users
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "name": "<script>alert('XSS')</script>",
+    "email": "xss@test.com"
+  }
+}
+
+tests {
+  test("XSS attempt blocked by WAF", function() {
+    // WAF should block XSS in request body
+    expect(res.status).to.be.oneOf([400, 403]);
+  });
+}
+
+docs {
+  # Cross-Site Scripting (XSS) Test
+
+  This request tests that the BIG-IP WAF blocks XSS payloads in API request bodies.
+
+  ## Attack Vector
+  Script injection in JSON body: `<script>alert('XSS')</script>`
+
+  ## Expected Behavior
+  - BIG-IP ASM should detect and block the XSS attempt
+  - Response should be 403 Forbidden or 400 Bad Request
+  - Request should appear in ASM logs with XSS violation
+
+  ## Verification
+  1. Check BIG-IP: Security > Event Logs > Application > Requests
+  2. Look for violation: Cross Site Scripting (XSS)
+}

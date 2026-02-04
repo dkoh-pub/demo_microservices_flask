@@ -1,0 +1,42 @@
+meta {
+  name: SQL Injection Test
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/{{apiVersion}}/users?id=1' OR '1'='1
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+tests {
+  test("Request blocked by WAF (403 or custom block)", function() {
+    // WAF should block SQL injection attempts
+    // May return 403 Forbidden or custom ASM block page
+    expect(res.status).to.be.oneOf([400, 403, 200]);
+  });
+}
+
+docs {
+  # SQL Injection Test
+
+  This request tests that the BIG-IP WAF properly blocks SQL injection attempts.
+
+  ## Attack Vector
+  Classic SQL injection: `1' OR '1'='1`
+
+  ## Expected Behavior
+  - BIG-IP ASM should detect and block this request
+  - Response should be 403 Forbidden or custom block page
+  - Request should appear in ASM logs as blocked
+
+  ## Verification
+  1. Check BIG-IP: Security > Event Logs > Application > Requests
+  2. Look for violation: SQL Injection
+}

@@ -1,0 +1,41 @@
+meta {
+  name: Path Traversal Test
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/{{apiVersion}}/users/../../../etc/passwd
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+tests {
+  test("Path traversal blocked by WAF", function() {
+    // WAF should block directory traversal attempts
+    expect(res.status).to.be.oneOf([400, 403, 404]);
+  });
+}
+
+docs {
+  # Path Traversal Test
+
+  This request tests that the BIG-IP WAF blocks directory traversal attacks.
+
+  ## Attack Vector
+  Path traversal: `/../../../etc/passwd`
+
+  ## Expected Behavior
+  - BIG-IP ASM should detect and block the traversal attempt
+  - Response should be 403 Forbidden or 400 Bad Request
+  - Request should appear in ASM logs with Directory Traversal violation
+
+  ## Verification
+  1. Check BIG-IP: Security > Event Logs > Application > Requests
+  2. Look for violation: Directory Traversal or Illegal URL
+}
